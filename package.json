@@ -12,7 +12,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@openzeppelin/test-helpers": "^0.5.12",
     "dotenv": "10.0.0",
+    "solidity-coverage": "^0.7.16",
     "truffle-plugin-verify": "^0.5.11"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.2.0",
+    "chai": "^4.3.4"
   }
 }

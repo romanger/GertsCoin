@@ -23,6 +23,8 @@
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
+require('dotenv').config()
+
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -93,6 +95,7 @@ module.exports = {
       //  },
       //  evmVersion: "byzantium"
       // }
+      version: "0.8.2"
     }
   },
 
@@ -104,5 +107,14 @@ module.exports = {
 
   db: {
     enabled: false
+  },
+
+  plugins: [
+    'truffle-plugin-verify',
+    'solidity-coverage'
+  ],
+
+  api_keys: {
+    etherscan: process.env.ETHERSCAN_API_KEY
   }
 };
