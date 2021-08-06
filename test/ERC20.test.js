@@ -6,21 +6,21 @@ const {
   shouldBehaveLikeERC20,
   shouldBehaveLikeERC20Transfer,
   shouldBehaveLikeERC20Approve,
-} = require('./GertsCoin.behavior');
+} = require('./ERC20.behavior');
 
-const GertsCoin = artifacts.require('../contracts/GertsCoin.sol');
-// const ERC20DecimalsMock = artifacts.require('ERC20DecimalsMock');
-contract('GertsCoin', function (accounts) {
+const ERC20Mock = artifacts.require('ERC20Mock');
+const ERC20DecimalsMock = artifacts.require('ERC20DecimalsMock');
+
+contract('ERC20', function (accounts) {
   const [ initialHolder, recipient, anotherAccount ] = accounts;
 
-  const name = 'GertsCoin';
-  const symbol = 'GRC';
+  const name = 'My Token';
+  const symbol = 'MTKN';
 
   const initialSupply = new BN(100);
-console.log(initialSupply);
+
   beforeEach(async function () {
-    this.token = await GertsCoin.new();
-    
+    this.token = await ERC20Mock.new(name, symbol, initialHolder, initialSupply);
   });
 
   it('has a name', async function () {
@@ -35,16 +35,16 @@ console.log(initialSupply);
     expect(await this.token.decimals()).to.be.bignumber.equal('18');
   });
 
-//   describe('set decimals', function () {
-//     const decimals = new BN(6);
+  describe('set decimals', function () {
+    const decimals = new BN(6);
 
-//     it('can set decimals during construction', async function () {
-//       const token = await ERC20DecimalsMock.new(name, symbol, decimals);
-//       expect(await token.decimals()).to.be.bignumber.equal(decimals);
-//     });
-//   });
+    it('can set decimals during construction', async function () {
+      const token = await ERC20DecimalsMock.new(name, symbol, decimals);
+      expect(await token.decimals()).to.be.bignumber.equal(decimals);
+    });
+  });
 
-  shouldBehaveLikeERC20('GertsCoin', initialSupply, initialHolder, recipient, anotherAccount);
+  shouldBehaveLikeERC20('ERC20', initialSupply, initialHolder, recipient, anotherAccount);
 
   describe('decrease allowance', function () {
     describe('when the spender is not the zero address', function () {
@@ -286,7 +286,7 @@ console.log(initialSupply);
   });
 
   describe('_transfer', function () {
-    shouldBehaveLikeERC20Transfer('GertsCoin', initialHolder, recipient, initialSupply, function (from, to, amount) {
+    shouldBehaveLikeERC20Transfer('ERC20', initialHolder, recipient, initialSupply, function (from, to, amount) {
       return this.token.transferInternal(from, to, amount);
     });
 
@@ -300,7 +300,7 @@ console.log(initialSupply);
   });
 
   describe('_approve', function () {
-    shouldBehaveLikeERC20Approve('GertsCoin', initialHolder, recipient, initialSupply, function (owner, spender, amount) {
+    shouldBehaveLikeERC20Approve('ERC20', initialHolder, recipient, initialSupply, function (owner, spender, amount) {
       return this.token.approveInternal(owner, spender, amount);
     });
 
