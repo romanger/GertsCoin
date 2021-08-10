@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
-import "./ERC20/extensions/IERC20Metadata.sol";
+import "./ERC20/IERC20.sol";
 
 contract Deposit {
     
     address public manager;
-    IERC20Metadata private _token;
     
-    mapping(address => mapping(string => uint)) public balances;   
-    mapping(string => IERC20Metadata) public tokensSupported;
+    mapping(address => uint) public balances;
+    mapping(address => uint) public balanceETH;   
+    mapping(address => bool) public tokensSupported;
 
     constructor (){
        manager = msg.sender; 
@@ -20,8 +20,8 @@ contract Deposit {
          _;
     }
 
-    modifier SupportedToken(string memory symbol) {
-        require(tokensSupported[symbol].totalSupply() > 0,'Token not supported');
+    modifier SupportedToken(address tokenAddress) {
+        require(tokensSupported[tokenAddress],'Token not supported');
         _;
     }
     
@@ -40,59 +40,66 @@ contract Deposit {
     );
 
 
+    // add token support
+    function addTockenSupport(address tokenAddress) public OnlyManager{
+        tokensSupported[tokenAddress] = true;
+    }
+
+    // remove token support
+
+    function removeTokenSupport(address tokenAddress) public OnlyManager {
+        delete tokensSupported[tokenAddress];
+    }
+
     // Deposit amount of ETH to contract
-    function deposit() public payable {
+    function depositETH() public payable {
         require(msg.value > 0, "The value can`t be empty");
-        balances[payable(msg.sender)]["ETH"] += msg.value;
+        balanceETH[payable(msg.sender)] += msg.value;
         emit DepositSuccess(msg.sender, msg.value, block.timestamp);
     }
 
     // Deposit supported token
-    function depositTocken(string calldata tokenSymbol, uint amount) public SupportedToken(tokenSymbol) {
-        
-        IERC20Metadata token = tokensSupported[tokenSymbol];
-        
+    function depositTocken(address tokenAddress, uint amount) public SupportedToken(tokenAddress) {
+        IERC20 token = IERC20(tokenAddress);
         require(amount > 0, 'Amount of tockens cant be empty');
         require(token.balanceOf(msg.sender) >= amount, "You dont have enough tokens");
-
-        token.allowance(msg.sender, address(this));
+      
         token.transferFrom(msg.sender, address(this), amount);
-        
-        balances[msg.sender][tokenSymbol] += amount;
+        balances[msg.sender] += amount;
         
         emit DepositSuccess(msg.sender, amount, block.timestamp);
     }
 
     // Withdraw amount of ETH to contract
-    function withdraw(uint amount) public payable {
+    function withdrawETH(uint amount) public payable {
+        require(amount <= balanceETH[msg.sender], "The requested amount is greater than the current deposit");
+        payable(msg.sender).transfer(amount); 
+        balanceETH[msg.sender] -= amount;
         
-        require(amount <= balances[msg.sender]["ETH"], "The requested amount is greater than the current deposit");
-        payable(msg.sender).transfer(amount);
-        balances[msg.sender]["ETH"] -= amount;
+        emit WithdrawSuccess(msg.sender, amount, balanceETH[msg.sender],block.timestamp );
+    }
+
+    function withdrawToken(address tokenAddress, uint amount) public SupportedToken(tokenAddress) {
+        IERC20 token = IERC20(tokenAddress);
+        require(amount <= balances[msg.sender], "The requested amount is greater than the current deposit");
+
+        token.transfer(address(this), amount); 
+        balances[msg.sender] -= amount;
         
-        emit WithdrawSuccess(msg.sender, amount, balances[msg.sender]["ETH"],block.timestamp );
+        emit WithdrawSuccess(msg.sender, amount, balances[msg.sender],block.timestamp);
     }
 
     // Get contract Ether balans for account
-    function getBalance() public view returns(uint) {
-        return balances[msg.sender]["ETH"];
+    function getBalanceETH() public view returns(uint) {
+        return balanceETH[msg.sender];
     }
-    
-    // Get account tocken balance 
-    function getAccountTockenBalance(string calldata tokenSymbol) public view returns(uint)  {
-        return tokensSupported[tokenSymbol].balanceOf(msg.sender);
-    }
-    
-    // Get contract supported token balans for account
-    function getTockenBalance(string calldata tokenSymbol) public view returns(uint) {
-        return balances[msg.sender][tokenSymbol];
-    }
-    
 
-    // add Support for token 
-    function supportTocken(address  tokenAddress) public OnlyManager{
-        _token = IERC20Metadata(tokenAddress);
-        tokensSupported[_token.symbol()] = _token;
+    // Get token balans for account
+
+     function getBalanceToken(address tokenAddress) public view SupportedToken(tokenAddress) returns(uint) {
+        return balances[msg.sender];
     }
+    
+    
 
 }

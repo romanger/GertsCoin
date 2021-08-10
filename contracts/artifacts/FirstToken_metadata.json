@@ -6,7 +6,23 @@
 	"output": {
 		"abi": [
 			{
-				"inputs": [],
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "name",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "symbol",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "initialSupply",
+						"type": "uint256"
+					}
+				],
 				"stateMutability": "nonpayable",
 				"type": "constructor"
 			},
@@ -294,7 +310,7 @@
 					"details": "See {IERC20-balanceOf}."
 				},
 				"decimals()": {
-					"details": "Returns the number of decimals used to get its user representation. For example, if `decimals` equals `2`, a balance of `505` tokens should be displayed to a user as `5.05` (`505 / 10 ** 2`). Tokens usually opt for a value of 18, imitating the relationship between Ether and Wei. This is the value {ERC20} uses, unless this function is overridden; NOTE: This information is only used for _display_ purposes: it in no way affects any of the arithmetic of the contract, including {IERC20-balanceOf} and {IERC20-transfer}."
+					"details": "Returns the number of decimals used to get its user representation. For example, if `decimals` equals `2`, a balance of `505` tokens should be displayed to a user as `5,05` (`505 / 10 ** 2`). Tokens usually opt for a value of 18, imitating the relationship between Ether and Wei. This is the value {ERC20} uses, unless this function is overridden; NOTE: This information is only used for _display_ purposes: it in no way affects any of the arithmetic of the contract, including {IERC20-balanceOf} and {IERC20-transfer}."
 				},
 				"decreaseAllowance(address,uint256)": {
 					"details": "Atomically decreases the allowance granted to `spender` by the caller. This is an alternative to {approve} that can be used as a mitigation for problems described in {IERC20-approve}. Emits an {Approval} event indicating the updated allowance. Requirements: - `spender` cannot be the zero address. - `spender` must have allowance for the caller of at least `subtractedValue`."
@@ -328,7 +344,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/GertsCoin.sol": "GertsCoin"
+			"contracts/FirstToken.sol": "FirstToken"
 		},
 		"evmVersion": "berlin",
 		"libraries": {},
@@ -342,15 +358,15 @@
 		"remappings": []
 	},
 	"sources": {
-		"contracts/ERC20/ERC20.sol": {
-			"keccak256": "0xb03df8481a954604ad0c9125680893b2e3f7ff770fe470e38b89ac61b84e8072",
+		"@openzeppelin/contracts/token/ERC20/ERC20.sol": {
+			"keccak256": "0x418cfe64226a974419f8ab7287ad4bb413156a4d7af8ab5d9bcaa5678d1a2f22",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b34655953d18ba3a45b762fb6bdbb6549af69a27435e10ece178742bf70baf45",
-				"dweb:/ipfs/QmcqjUoFLLMyx7dbwSHUnDBH6aphkVHXWQvQRRev5EAWEh"
+				"bzz-raw://9f65118c99d5d6cfe602720418b8551c2da6c3de650e61c5231b0be4396aae0d",
+				"dweb:/ipfs/QmdLmkRHJhEifzzDjF44MHXcQx2SXc5EzhpHzN2z1vUq8H"
 			]
 		},
-		"contracts/ERC20/IERC20.sol": {
+		"@openzeppelin/contracts/token/ERC20/IERC20.sol": {
 			"keccak256": "0x027b891937d20ccf213fdb9c31531574256de774bda99d3a70ecef6e1913ed2a",
 			"license": "MIT",
 			"urls": [
@@ -358,7 +374,7 @@
 				"dweb:/ipfs/Qmbn5Mj7aUn8hJuQ8VrQjjEXRsXyJKykgnjR9p4C3nfLtL"
 			]
 		},
-		"contracts/ERC20/extensions/IERC20Metadata.sol": {
+		"@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol": {
 			"keccak256": "0x83fe24f5c04a56091e50f4a345ff504c8bff658a76d4c43b16878c8f940c53b2",
 			"license": "MIT",
 			"urls": [
@@ -366,20 +382,20 @@
 				"dweb:/ipfs/QmSim72e3ZVsfgZt8UceCvbiSuMRHR6WDsiamqNzZahGSY"
 			]
 		},
-		"contracts/GertsCoin.sol": {
-			"keccak256": "0xff3a1e948e86c027aa76f358abf67557390665a7352e70ed574b927562181992",
-			"license": "GPL-3.0",
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0x95098bd1d9c8dec4d80d3dedb88a0d949fa0d740ee99f2aa466bc308216ca6d5",
+			"license": "MIT",
 			"urls": [
-				"bzz-raw://bf8cb884d91bc2972c349a9d3c77ebb31bb9f19a087332d5aa131d0d33e05ffe",
-				"dweb:/ipfs/QmPR82byEg35ra6SBCa2SxeMhKTH8TmCApNvjAaRhcxGMH"
+				"bzz-raw://7fec968dcd68e13961521fa3c7dd87baecad91a2653b19240e81f21cc4f3ba85",
+				"dweb:/ipfs/QmaXtsYt4Mphm8XHNUfk2me1cF3ssS2SqDBNFpYAzMjomC"
 			]
 		},
-		"utils/Context.sol": {
-			"keccak256": "0xfbacb5d7d9d36896db9c9045f2210564d1b20338d24f2a1d74f0e2f04d8520c8",
-			"license": "UNLICENSED",
+		"contracts/FirstToken.sol": {
+			"keccak256": "0x7e35f8df66ec850b8fe119c750a9916fadcb21e738f5138ff9437408aec654a7",
+			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://37d6e26ad686bd9c07752f1624a904b622ba38b4cc78c7e6904c3b3c4a75e3e8",
-				"dweb:/ipfs/QmTWpi8fbWkbyN8G4mCFbYQ3bExbL1gbJghofCC3b7W2eJ"
+				"bzz-raw://a4285c3d524dc00249a6785122c09b95e8463acd973aa11f0ff5e5c1552b3863",
+				"dweb:/ipfs/QmYYGQZ4CBBRcfEsneoYXYFATaxkaEgQnv48tHn2wvM1tn"
 			]
 		}
 	},
