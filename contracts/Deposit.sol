@@ -41,7 +41,7 @@ contract Deposit {
 
 
     // add token support
-    function addTockenSupport(address tokenAddress) public OnlyManager{
+    function addTokenSupport(address tokenAddress) public OnlyManager{
         tokensSupported[tokenAddress] = true;
     }
 
@@ -59,7 +59,7 @@ contract Deposit {
     }
 
     // Deposit supported token
-    function depositTocken(address tokenAddress, uint amount) public SupportedToken(tokenAddress) {
+    function depositToken(address tokenAddress, uint amount) public SupportedToken(tokenAddress) {
         IERC20 token = IERC20(tokenAddress);
         require(amount > 0, 'Amount of tockens cant be empty');
         require(token.balanceOf(msg.sender) >= amount, "You dont have enough tokens");
@@ -83,7 +83,7 @@ contract Deposit {
         IERC20 token = IERC20(tokenAddress);
         require(amount <= balances[msg.sender], "The requested amount is greater than the current deposit");
 
-        token.transfer(address(this), amount); 
+        token.transfer(msg.sender, amount); 
         balances[msg.sender] -= amount;
         
         emit WithdrawSuccess(msg.sender, amount, balances[msg.sender],block.timestamp);
@@ -100,6 +100,4 @@ contract Deposit {
         return balances[msg.sender];
     }
     
-    
-
 }

@@ -1,3 +1,4 @@
+const { BN } = require('@openzeppelin/test-helpers');
 const assert = require("assert");
 
 const GertsCoin = artifacts.require("GertsCoin");
@@ -21,15 +22,15 @@ contract("Deposit", function (accounts) {
     });
   });
 
-  describe("addTockenSupport", () => {
+  describe("addTokenSupport", () => {
     it("token added to deposit", async () => {
-      await deposit.addTockenSupport(coin.address, { from: initialHolder });
+      await deposit.addTokenSupport(coin.address, { from: initialHolder });
       assert.equal(await deposit.tokensSupported(coin.address), true);
     });
 
     it("only manager can add token", async () => {
       try {
-        await deposit.addTockenSupport(coin.address, { from: otherAccount });
+        await deposit.addTokenSupport(coin.address, { from: otherAccount });
       } catch (error) {
         assert.equal(error.reason , "Only manager can run this function");
       }
@@ -38,7 +39,7 @@ contract("Deposit", function (accounts) {
 
   describe("removeTokenSupport", () => {
     it("token removed from contract", async () => {
-      await deposit.addTockenSupport(coin.address, { from: initialHolder });
+      await deposit.addTokenSupport(coin.address, { from: initialHolder });
       await deposit.removeTokenSupport(coin.address, { from: initialHolder });
 
       assert.equal(await deposit.tokensSupported(coin.address), 0);
@@ -46,7 +47,7 @@ contract("Deposit", function (accounts) {
 
     it("only manager can remove token", async () => {
       try {
-        await deposit.addTockenSupport(coin.address, { from: initialHolder });
+        await deposit.addTokenSupport(coin.address, { from: initialHolder });
         await deposit.removeTokenSupport(coin.address, { from: otherAccount });
       } catch (error) {
         assert.equal(error.reason , "Only manager can run this function");
@@ -80,31 +81,31 @@ contract("Deposit", function (accounts) {
 
   describe("depositToken",async () => {
     it("amount must be greater then 0", async () =>{
-      await deposit.addTockenSupport(coin.address);
+      await deposit.addTokenSupport(coin.address);
       try {
-        await deposit.depositTocken(coin.address, 0, {from: initialHolder});
+        await deposit.depositToken(coin.address, 0, {from: initialHolder});
       } catch (error) {
         assert.equal(error.reason , "Amount of tockens cant be empty");
       }
     });
     it("sender token balance must be greater then amount", async () => {
       
-      await deposit.addTockenSupport(coin.address);
+      await deposit.addTokenSupport(coin.address);
 
       await coin.transfer(otherAccount, 1, {from: initialHolder});
       await coin.approve(deposit.address, 2, {from: otherAccount});
 
       try {
-        await deposit.depositTocken(coin.address, 2, {from: otherAccount});
+        await deposit.depositToken(coin.address, 2, {from: otherAccount});
       } catch(error){
         assert.equal(error.reason , "You dont have enough tokens");
       }
     });
     it("account deposit token to contract successfully", async () => {
-      await deposit.addTockenSupport(coin.address);
+      await deposit.addTokenSupport(coin.address);
       await coin.approve(deposit.address, 10, {from: initialHolder});
 
-      await deposit.depositTocken(coin.address, 10, {from:initialHolder});
+      await deposit.depositToken(coin.address, 10, {from:initialHolder});
       assert.equal(await deposit.balances(initialHolder), 10);
     });
 
@@ -129,6 +130,35 @@ contract("Deposit", function (accounts) {
       const difference = finalBalance - initialBalance;
 
       assert(difference > web3.utils.toWei("1.8", "ether"));
+    });
+  });
+
+  describe("withdrawToken", () => {
+    it("requested amount must be equal or lower then current deposit", async () => {
+      await deposit.addTokenSupport(coin.address);
+      await coin.approve(deposit.address, 10, {from: initialHolder});
+      await deposit.depositToken(coin.address, 10, {from:initialHolder});
+
+      try {
+        await deposit.withdrawToken(coin.address, 11,{from: initialHolder});
+      } catch(error) {
+        assert.equal(error.reason, "The requested amount is greater than the current deposit");
+      }
+    });
+
+    it("requested token amount sent to user account", async () => {
+      
+      await deposit.addTokenSupport(coin.address);
+      await coin.transfer(otherAccount, 4, {from: initialHolder});
+
+      await coin.approve(deposit.address, 2, {from: otherAccount});
+      await deposit.depositToken(coin.address, 2 , {from: otherAccount});
+
+      const initialBalance = await coin.balanceOf(otherAccount);
+      await deposit.withdrawToken(coin.address, 2,{ from:otherAccount});
+      const finalBalance = await coin.balanceOf(otherAccount);
+      const difference = finalBalance - initialBalance;
+      assert.equal(difference, web3.utils.toWei("2", "wei"));
     });
   });
 });
