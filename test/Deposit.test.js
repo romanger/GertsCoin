@@ -119,5 +119,16 @@ contract("Deposit", function (accounts) {
         assert.equal(error.reason, "The requested amount is greater than the current deposit");
       }
     });
+
+    it("requested amount sent to user account", async () => {
+      await deposit.depositETH({from: initialHolder, value: web3.utils.toWei("2", "ether")});
+      
+      const initialBalance = await web3.eth.getBalance(initialHolder);
+      await deposit.withdrawETH(web3.utils.toWei("2", "ether"),{ from:initialHolder});
+      const finalBalance = await web3.eth.getBalance(initialHolder);
+      const difference = finalBalance - initialBalance;
+
+      assert(difference > web3.utils.toWei("1.8", "ether"));
+    });
   });
 });
